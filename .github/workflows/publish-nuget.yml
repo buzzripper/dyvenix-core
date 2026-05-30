@@ -20,6 +20,9 @@ env:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout
@@ -56,13 +59,14 @@ jobs:
         id: check
         run: |
           package_id_lower=$(echo "${PACKAGE_ID}" | tr '[:upper:]' '[:lower:]')
-          status=$(curl -s -o /dev/null -w "%{http_code}" \
-            "https://api.nuget.org/v3-flatcontainer/${package_id_lower}/${{ steps.version.outputs.version }}/${package_id_lower}.${{ steps.version.outputs.version }}.nupkg")
-          if [ "$status" = "200" ]; then
-            echo "Version ${{ steps.version.outputs.version }} already exists on NuGet. Skipping publish."
+          # Query the GitHub Packages NuGet feed (requires auth) for existing versions of this package.
+          versions=$(curl -s -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
+            "https://nuget.pkg.github.com/${{ github.repository_owner }}/${package_id_lower}/index.json" || true)
+          if echo "$versions" | grep -q "\"${{ steps.version.outputs.version }}\""; then
+            echo "Version ${{ steps.version.outputs.version }} already exists in GitHub Packages. Skipping publish."
             echo "should_publish=false" >> "$GITHUB_OUTPUT"
           else
-            echo "Version ${{ steps.version.outputs.version }} not found on NuGet (HTTP $status). Will publish."
+            echo "Version ${{ steps.version.outputs.version }} not found in GitHub Packages. Will publish."
             echo "should_publish=true" >> "$GITHUB_OUTPUT"
           fi
 
@@ -70,6 +74,16 @@ jobs:
         if: steps.check.outputs.should_publish == 'true'
         run: dotnet pack ${{ env.PROJECT_PATH }} --configuration Release --no-build --output ./artifacts -p:Version=${{ steps.version.outputs.version }}
 
-      - name: Push to NuGet
+      - name: Configure GitHub NuGet source
         if: steps.check.outputs.should_publish == 'true'
-        run: dotnet nuget push "./artifacts/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+        run: >
+          dotnet nuget add source
+          "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+          --name github
+          --username ${{ github.actor }}
+          --password ${{ secrets.GITHUB_TOKEN }}
+          --store-password-in-clear-text
+
+      - name: Push to GitHub Packages
+        if: steps.check.outputs.should_publish == 'true'
+        run: dotnet nuget push "./artifacts/*.nupkg" --source github --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
