@@ -1,0 +1,75 @@
+name: Publish NuGet Package
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g. 1.2.0). Used only for manual runs.'
+        required: true
+
+env:
+  PROJECT_PATH: src/Dyvenix.Core/Dyvenix.Core.csproj
+  PACKAGE_ID: Dyvenix.Core
+  DOTNET_VERSION: '10.0.x'
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            version="${{ github.event.inputs.version }}"
+          else
+            # Strip the refs/tags/v prefix from the pushed tag (e.g. refs/tags/v1.2.0 -> 1.2.0)
+            version="${GITHUB_REF#refs/tags/v}"
+          fi
+          if [ -z "$version" ]; then
+            echo "Could not resolve a version."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Resolved version: $version"
+
+      - name: Restore
+        run: dotnet restore ${{ env.PROJECT_PATH }}
+
+      - name: Build
+        run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore -p:Version=${{ steps.version.outputs.version }}
+
+      - name: Check if version already published
+        id: check
+        run: |
+          package_id_lower=$(echo "${PACKAGE_ID}" | tr '[:upper:]' '[:lower:]')
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://api.nuget.org/v3-flatcontainer/${package_id_lower}/${{ steps.version.outputs.version }}/${package_id_lower}.${{ steps.version.outputs.version }}.nupkg")
+          if [ "$status" = "200" ]; then
+            echo "Version ${{ steps.version.outputs.version }} already exists on NuGet. Skipping publish."
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Version ${{ steps.version.outputs.version }} not found on NuGet (HTTP $status). Will publish."
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Pack
+        if: steps.check.outputs.should_publish == 'true'
+        run: dotnet pack ${{ env.PROJECT_PATH }} --configuration Release --no-build --output ./artifacts -p:Version=${{ steps.version.outputs.version }}
+
+      - name: Push to NuGet
+        if: steps.check.outputs.should_publish == 'true'
+        run: dotnet nuget push "./artifacts/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
