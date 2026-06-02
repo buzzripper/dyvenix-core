@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AssemblyName>Dyvenix.Core.Api</AssemblyName>
+		<RootNamespace>Dyvenix.Core.Api</RootNamespace>
+		<Configurations>Debug;Release;Debug-Local</Configurations>
+	</PropertyGroup>
+
+	<!-- NuGet -->
+	<PropertyGroup>
+		<PackageId>Dyvenix.Core.Api</PackageId>
+		<!-- Bump this Version to trigger a new pack/publish from the CI workflow. -->
+		<Version>1.0.0</Version>
+		<Company>Dyvenix</Company>
+		<Authors>buzzripper</Authors>
+		<Description>Dyvenix.Core.Api shared library.</Description>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<OutputType>Library</OutputType>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryUrl>https://github.com/buzzripper/dyvenix-core</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+	<ItemGroup>
+	  <PackageReference Include="Dyvenix.Core" Version="1.0.2" />
+	  <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.3.10" />
+	  <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.8" />
+	</ItemGroup>
+
+</Project>

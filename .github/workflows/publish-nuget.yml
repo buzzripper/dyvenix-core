@@ -7,11 +7,10 @@ on:
       - main
     paths:
       - 'src/Dyvenix.Core/Dyvenix.Core.csproj'
+      - 'src/Dyvenix.Core.Api/Dyvenix.Core.Api.csproj'
   workflow_dispatch:
 
 env:
-  PROJECT_PATH: src/Dyvenix.Core/Dyvenix.Core.csproj
-  PACKAGE_ID: Dyvenix.Core
   DOTNET_VERSION: '10.0.x'
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
@@ -22,6 +21,19 @@ jobs:
     permissions:
       contents: read
       packages: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project_path: src/Dyvenix.Core/Dyvenix.Core.csproj
+            package_id: Dyvenix.Core
+          - project_path: src/Dyvenix.Core.Api/Dyvenix.Core.Api.csproj
+            package_id: Dyvenix.Core.Api
+
+    env:
+      PROJECT_PATH: ${{ matrix.project_path }}
+      PACKAGE_ID: ${{ matrix.package_id }}
 
     steps:
       - name: Checkout

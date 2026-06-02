@@ -4,9 +4,8 @@
     <File Path=".github/workflows/publish-nuget.yml" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/Dyvenix.Core.Api/Dyvenix.Core.Api.csproj" />
     <Project Path="src/Dyvenix.Core/Dyvenix.Core.csproj" />
   </Folder>
-  <Folder Name="/tests/">
-    <Project Path="src/tests/Dyvenix.Core.Tests/Dyvenix.Core.Tests.csproj" />
-  </Folder>
+  <Folder Name="/tests/" />
 </Solution>
