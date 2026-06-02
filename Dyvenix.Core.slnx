@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/.gitHub/" />
+  <Folder Name="/.gitHub/workflows/">
+    <File Path=".github/workflows/publish-nuget.yml" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Dyvenix.Core/Dyvenix.Core.csproj" />
   </Folder>

@@ -2,13 +2,12 @@ name: Publish NuGet Package
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - Develop
+      - main
+    paths:
+      - 'src/Dyvenix.Core/Dyvenix.Core.csproj'
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version to publish (e.g. 1.2.0). Used only for manual runs.'
-        required: true
 
 env:
   PROJECT_PATH: src/Dyvenix.Core/Dyvenix.Core.csproj
@@ -33,17 +32,13 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Resolve version
+      - name: Resolve version from csproj
         id: version
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            version="${{ github.event.inputs.version }}"
-          else
-            # Strip the refs/tags/v prefix from the pushed tag (e.g. refs/tags/v1.2.0 -> 1.2.0)
-            version="${GITHUB_REF#refs/tags/v}"
-          fi
+          # Read the <Version> element from the project file.
+          version=$(grep -oPm1 '(?<=<Version>)[^<]+' "${PROJECT_PATH}")
           if [ -z "$version" ]; then
-            echo "Could not resolve a version."
+            echo "Could not read <Version> from ${PROJECT_PATH}."
             exit 1
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
@@ -53,7 +48,7 @@ jobs:
         run: dotnet restore ${{ env.PROJECT_PATH }}
 
       - name: Build
-        run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore -p:Version=${{ steps.version.outputs.version }}
+        run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
 
       - name: Check if version already published
         id: check
@@ -72,7 +67,7 @@ jobs:
 
       - name: Pack
         if: steps.check.outputs.should_publish == 'true'
-        run: dotnet pack ${{ env.PROJECT_PATH }} --configuration Release --no-build --output ./artifacts -p:Version=${{ steps.version.outputs.version }}
+        run: dotnet pack ${{ env.PROJECT_PATH }} --configuration Release --no-build --output ./artifacts
 
       - name: Configure GitHub NuGet source
         if: steps.check.outputs.should_publish == 'true'

@@ -6,17 +6,19 @@
 		<Nullable>enable</Nullable>
 		<AssemblyName>Dyvenix.Core</AssemblyName>
 		<RootNamespace>Dyvenix.Core</RootNamespace>
+		<Configurations>Debug;Release;Debug-Local</Configurations>
 	</PropertyGroup>
 
+	<!-- NuGet -->
 	<PropertyGroup>
 		<PackageId>Dyvenix.Core</PackageId>
-		<!-- Version is supplied by the CI workflow from the Git tag (e.g. -p:Version=1.2.0).
-			 This default is only used for local/dev builds without a tag. -->
-		<Version>0.0.0-dev</Version>
-		<!-- Pinned to major-only for stable binding identity; bump manually on a major release. -->
-		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<!-- Bump this Version to trigger a new pack/publish from the CI workflow. -->
+		<Version>1.0.2</Version>
+		<Company>Dyvenix</Company>
 		<Authors>buzzripper</Authors>
 		<Description>Dyvenix.Core shared library.</Description>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<OutputType>Library</OutputType>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryUrl>https://github.com/buzzripper/dyvenix-core</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
