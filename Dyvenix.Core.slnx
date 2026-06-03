@@ -7,5 +7,7 @@
     <Project Path="src/Dyvenix.Core.Api/Dyvenix.Core.Api.csproj" />
     <Project Path="src/Dyvenix.Core/Dyvenix.Core.csproj" />
   </Folder>
-  <Folder Name="/tests/" />
+  <Folder Name="/tests/">
+    <Project Path="tests/Dyvenix.Core.Tests/Dyvenix.Core.Tests.csproj" />
+  </Folder>
 </Solution>
