@@ -13,7 +13,7 @@
 	<PropertyGroup>
 		<PackageId>Dyvenix.Core.Api</PackageId>
 		<!-- Bump this Version to trigger a new pack/publish from the CI workflow. -->
-		<Version>1.0.3</Version>
+		<Version>1.0.4</Version>
 		<Company>Dyvenix</Company>
 		<Authors>buzzripper</Authors>
 		<Description>Dyvenix.Core.Api shared library.</Description>
@@ -26,13 +26,35 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
-	
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<NoWarn>1701;1702;1591</NoWarn>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<NoWarn>1701;1702;1591</NoWarn>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Local|AnyCPU'">
+		<NoWarn>1701;1702;1591</NoWarn>
+	</PropertyGroup>
+
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.3.10" />
-	  <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.8" />
+		<PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.3.10" />
+		<PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.6.0" />
+		<PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="10.6.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
+		<PackageReference Include="Asp.Versioning.Mvc" Version="10.0.0" />
+		<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.0.0" />
+		<PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.15.3" />
+		<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.3" />
+		<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.15.3" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.2" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.15.1" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.1" />
+
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\Dyvenix.Core\Dyvenix.Core.csproj" />
+		<ProjectReference Include="..\Dyvenix.Core\Dyvenix.Core.csproj" />
 	</ItemGroup>
 
 </Project>

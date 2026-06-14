@@ -13,7 +13,7 @@
 	<PropertyGroup>
 		<PackageId>Dyvenix.Core</PackageId>
 		<!-- Bump this Version to trigger a new pack/publish from the CI workflow. -->
-		<Version>1.0.3</Version>
+		<Version>1.0.4</Version>
 		<Company>Dyvenix</Company>
 		<Authors>buzzripper</Authors>
 		<Description>Dyvenix.Core shared library.</Description>
@@ -25,6 +25,16 @@
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+	
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <NoWarn>1701;1702;1591</NoWarn>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <NoWarn>1701;1702;1591</NoWarn>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Local|AnyCPU'">
+	  <NoWarn>1701;1702;1591</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
